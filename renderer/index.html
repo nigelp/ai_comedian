@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Dial-a-Standup</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+      <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <button id="menuButton" class="menu-button">
+        <img src="menu-icon.png" alt="Menu Icon" style="filter: invert(100%);">
+    </button>
+      <div class="container">
+          <div class="stage" id="stage">
+              <div class="stage-light left"></div>
+              <div class="stage-light right"></div>
+              <div class="mic-icon"></div>
+              <div class="stage-content">
+                <div class="comedian-container">
+                    <!-- Empty stage state - this is the default -->
+                    <img src="../empty-stage.png" alt="Empty Stage" class="stage-state" id="emptyStage">
+                    
+                    <!-- Microphone state - shown when initializing -->
+                    <img src="../mic-stand.png" alt="Microphone" class="stage-state" id="micStand">
+                    
+                    <!-- Comedian state - shown when performing -->
+                    <img src="../comedian-placeholder.png" alt="Virtual Comedian" class="stage-state" id="comedian">
+                </div>
+                <div class="generation-status">Writing your routine...</div>
+                <div id="waveform"></div>
+            </div>
+          </div>
+  
+          <div class="input-group">
+              <textarea 
+                  id="topic" 
+                  placeholder="Tell me what to joke about..."
+                  rows="2"
+                  autocomplete="off"
+                  spellcheck="true"></textarea>
+                  <button id="generate"><i class="fas fa-wand-magic"></i> Generate Routine</button>
+                  <button id="saveAudio" class="action-button"><i class="fas fa-save"></i> Save</button>
+                  <button id="pausePlay" class="action-button"><i class="fas fa-pause"></i> Pause</button>
+          </div>
+  
+          <div id="loading">Writing your routine... </div>
+      </div>
+      <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h2>Voice</h2>
+            <div class="form-group">
+                <label for="voiceSelect">Select Voice</label>
+                <select id="voiceSelect"></select>
+
+            </div>            
+            <h2>API Settings</h2>
+            <div id="missingKeysMessage" class="missing-keys-message"></div>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="groqKey">Groq API Key</label>
+                    <input type="password" id="groqKey" placeholder="Enter Groq API key">
+                </div>
+                <div class="form-group">
+                    <label for="elevenLabsKey">ElevenLabs API Key</label>
+                    <input type="password" id="elevenLabsKey" placeholder="Enter ElevenLabs API key">
+                </div>
+                <div class="button-group">
+                    <button id="saveSettings" class="primary-button">Save</button>
+                    <button id="closeSettings" class="secondary-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.8.11/wavesurfer.min.js"></script>
+      <script src="renderer.js"></script>
+  </body>
+  </html>

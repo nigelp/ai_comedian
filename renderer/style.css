@@ -1,0 +1,405 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #1a1a1a;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.stage {
+  background: #2a2a2a;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  perspective: 1000px;
+}
+
+.stage-content {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.comedian-container {
+  position: relative;
+  transition: transform 0.5s ease;
+  transform-origin: center center;
+}
+
+.comedian-img {
+  width: 300px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.02) translateY(-2px); }
+}
+
+@keyframes emphasis {
+  0%, 100% { transform: scale(1.02) translateY(-2px); }
+  50% { transform: scale(1.05) translateY(-5px); }
+}
+
+@keyframes punchline {
+  0% { transform: scale(1.02) translateY(-2px) translateZ(0); }
+  25% { transform: scale(1.06) translateY(-8px) translateZ(20px); }
+  75% { transform: scale(1.06) translateY(-8px) translateZ(20px); }
+  100% { transform: scale(1.02) translateY(-2px) translateZ(0); }
+}
+
+.comedian-container.breathing {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.comedian-container.emphasis {
+  animation: emphasis 1s ease-in-out;
+}
+
+.comedian-container.punchline {
+  animation: punchline 1.5s ease-in-out;
+}
+
+#waveform {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 0 0 12px 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#waveform.visible {
+  opacity: 1;
+}
+
+.input-group {
+  margin: 20px 0;
+  position: relative;
+}
+
+textarea {
+  width: calc(100% - 24px);
+  padding: 12px;
+  font-size: 16px;
+  background: #333;
+  border: 2px solid #444;
+  border-radius: 12px;
+  color: white;
+  margin-bottom: 15px;
+  resize: none;
+  min-height: 60px;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #ff4444;
+}
+
+textarea::placeholder {
+  color: #888;
+}
+
+button {
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+}
+
+button:hover {
+  background: #ff6666;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#loading {
+  display: none;
+  color: #ff4444;
+  margin: 20px 0;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.mic-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: #ff4444;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  display: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mic-icon.active {
+  display: block;
+}
+
+.stage-light {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(255,68,68,0.2) 0%, rgba(255,68,68,0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.stage-light.left {
+  top: -20px;
+  left: -20px;
+}
+
+.stage-light.right {
+  top: -20px;
+  right: -20px;
+}
+
+.comedian-container {
+  position: relative;
+  transition: transform 0.5s ease;
+  transform-origin: center center;
+  width: 300px;  /* Add this */
+  height: 300px; /* Add this */
+  margin: 0 auto; /* Add this */
+}
+
+.stage-state {
+  width: 100%;  /* Change from 300px to 100% */
+  height: 100%; /* Add this */
+  margin: 0;    /* Change from auto to 0 */
+  display: none;
+  opacity: 0;   /* Add this */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.5s ease-in-out;
+}
+
+.stage-state.active {
+  display: block;
+  opacity: 1;   /* Add this */
+}
+
+.stage-state.active {
+  display: block;
+}
+
+/* Loading animation */
+@keyframes thinking {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+#micStand.loading {
+  animation: thinking 2s ease-in-out infinite;
+}
+
+/* Progress text styling */
+.generation-status {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #ff4444;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.generation-status.visible {
+  opacity: 1;
+}
+
+#pausePlay {
+  display: none;
+}
+
+#pausePlay.visible {
+  display: inline-block;
+}
+
+.missing-keys-message {
+  display: none;  /* Add this line */
+  background-color: rgba(255, 89, 94, 0.1);
+  color: #ff595e;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border: 1px solid rgba(255, 89, 94, 0.2);
+  width: 100%;  /* Add this line */
+  box-sizing: border-box;  /* Add this line */
+}
+
+/* Make the text more visible */
+.missing-keys-message:not(:empty) {
+  display: block;
+}
+
+@keyframes spotlight {
+  0% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.5; }
+}
+
+.performing .stage-light {
+  animation: spotlight 2s infinite;
+}
+
+.performing .comedian-container {
+  animation: breathe 3s ease-in-out infinite;
+}
+  
+  #suggestions input {
+    margin: 10px;
+    padding: 5px;
+    width: 200px;
+  }
+  
+  #output {
+    margin-top: 20px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .menu-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #ffffff;
+    z-index: 100;
+    transition: opacity 0.2s;
+}
+
+.menu-button:hover {
+    opacity: 0.8;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #2a2a2a;
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    color: #ffffff;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #cccccc;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.primary-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.secondary-button {
+    background-color: #666;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.primary-button:hover, .secondary-button:hover {
+    opacity: 0.9;
+}
