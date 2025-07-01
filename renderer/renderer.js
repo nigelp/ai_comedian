@@ -18,8 +18,11 @@ const settingsModal = document.getElementById('settingsModal');
 const closeSettings = document.getElementById('closeSettings');
 const saveSettings = document.getElementById('saveSettings');
 const groqKeyInput = document.getElementById('groqKey');
-const elevenLabsKeyInput = document.getElementById('elevenLabsKey');
+const replicateApiKeyInput = document.getElementById('replicateApiKey');
 const voiceSelect = document.getElementById('voiceSelect');
+const modelSelect = document.getElementById('modelSelect');
+const reasoningToggle = document.getElementById('reasoningToggle');
+const reasoningGroup = document.getElementById('reasoningGroup');
 const statusEl = document.querySelector('.generation-status');
 
 const stageElements = {
@@ -28,11 +31,38 @@ const stageElements = {
     comedian: document.getElementById('comedian'),
 };
 
-// Voices Array
+// Voices Array - Kokoro TTS voices
 const voices = [
-    { id: 'wLoW00IP5kfH8oiOBAPp', name: 'Grant', gender: 'Male' },
-    { id: 'NFG5qt843uXKj4pFvR7C', name: 'Adam', gender: 'Male' },
-    { id: 'dACWdVrMuoWEQzp6Uz5e', name: 'Ryan', gender: 'Male' },
+    // American Female (af_)
+    { id: 'af_alloy', name: 'Alloy', gender: 'American Female' },
+    { id: 'af_aoede', name: 'Aoede', gender: 'American Female' },
+    { id: 'af_bella', name: 'Bella', gender: 'American Female' },
+    { id: 'af_jessica', name: 'Jessica', gender: 'American Female' },
+    { id: 'af_kore', name: 'Kore', gender: 'American Female' },
+    { id: 'af_nicole', name: 'Nicole', gender: 'American Female' },
+    { id: 'af_nova', name: 'Nova', gender: 'American Female' },
+    { id: 'af_river', name: 'River', gender: 'American Female' },
+    { id: 'af_sarah', name: 'Sarah', gender: 'American Female' },
+    { id: 'af_sky', name: 'Sky', gender: 'American Female' },
+    // American Male (am_)
+    { id: 'am_adam', name: 'Adam', gender: 'American Male' },
+    { id: 'am_echo', name: 'Echo', gender: 'American Male' },
+    { id: 'am_eric', name: 'Eric', gender: 'American Male' },
+    { id: 'am_fenrir', name: 'Fenrir', gender: 'American Male' },
+    { id: 'am_liam', name: 'Liam', gender: 'American Male' },
+    { id: 'am_michael', name: 'Michael', gender: 'American Male' },
+    { id: 'am_onyx', name: 'Onyx', gender: 'American Male' },
+    { id: 'am_puck', name: 'Puck', gender: 'American Male' },
+    // British Female (bf_)
+    { id: 'bf_alice', name: 'Alice', gender: 'British Female' },
+    { id: 'bf_emma', name: 'Emma', gender: 'British Female' },
+    { id: 'bf_isabella', name: 'Isabella', gender: 'British Female' },
+    { id: 'bf_lily', name: 'Lily', gender: 'British Female' },
+    // British Male (bm_)
+    { id: 'bm_daniel', name: 'Daniel', gender: 'British Male' },
+    { id: 'bm_fable', name: 'Fable', gender: 'British Male' },
+    { id: 'bm_george', name: 'George', gender: 'British Male' },
+    { id: 'bm_lewis', name: 'Lewis', gender: 'British Male' },
 ];
 
 // Helper Functions
@@ -79,6 +109,16 @@ function populateVoiceDropdown(selectedVoice) {
     voiceSelect.value = selectedVoice || voices[0].id; // Set default or saved voice
 }
 
+// Show/hide reasoning toggle based on selected model
+function updateReasoningVisibility() {
+    const selectedModel = modelSelect.value;
+    if (selectedModel === 'deepseek-r1-distill-llama-70b') {
+        reasoningGroup.style.display = 'block';
+    } else {
+        reasoningGroup.style.display = 'none';
+    }
+}
+
 // Animation State Management
 function setAnimationState(state) {
     const comedianContainer = document.querySelector('.comedian-container');
@@ -108,7 +148,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const settings = await window.api.getSettings();
     populateVoiceDropdown(settings.selectedVoice);
     groqKeyInput.value = settings.groqKey || '';
-    elevenLabsKeyInput.value = settings.elevenLabsKey || '';
+    replicateApiKeyInput.value = settings.replicateApiKey || '';
+    modelSelect.value = settings.selectedModel || 'qwen/qwen3-32b';
+    reasoningToggle.checked = settings.enableReasoning || false;
+    
+    // Update reasoning visibility based on selected model
+    updateReasoningVisibility();
 
     // Initialise stage to empty
     updateStageState(states.EMPTY);
@@ -136,18 +181,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.style.height = `${this.scrollHeight}px`;
     });
 
+    // Model selection change handler
+    modelSelect.addEventListener('change', updateReasoningVisibility);
+
     // Save settings
     saveSettings.addEventListener('click', async () => {
         const groqKey = groqKeyInput.value.trim();
-        const elevenLabsKey = elevenLabsKeyInput.value.trim();
+        const replicateApiKey = replicateApiKeyInput.value.trim();
         const selectedVoice = voiceSelect.value;
+        const selectedModel = modelSelect.value;
+        const enableReasoning = reasoningToggle.checked;
 
-        if (!groqKey || !elevenLabsKey) {
+        if (!groqKey || !replicateApiKey) {
             showError('Please enter both API keys.');
             return;
         }
 
-        await window.api.saveSettings({ groqKey, elevenLabsKey, selectedVoice });
+        await window.api.saveSettings({
+            groqKey,
+            replicateApiKey,
+            selectedVoice,
+            selectedModel,
+            enableReasoning
+        });
         settingsModal.style.display = 'none';
     });
 

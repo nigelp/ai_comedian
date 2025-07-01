@@ -52,8 +52,25 @@
             <div class="form-group">
                 <label for="voiceSelect">Select Voice</label>
                 <select id="voiceSelect"></select>
-
             </div>            
+            <h2>Model Settings</h2>
+            <div class="form-group">
+                <label for="modelSelect">Select Model</label>
+                <select id="modelSelect">
+                    <option value="qwen/qwen3-32b">Qwen 3 32B</option>
+                    <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
+                    <option value="llama3-70b-8192">Llama 3 70B 8192</option>
+                </select>
+            </div>
+            <div class="form-group" id="reasoningGroup" style="display: none;">
+                <label for="reasoningToggle">Enable Reasoning</label>
+                <div class="toggle-container">
+                    <input type="checkbox" id="reasoningToggle" class="toggle-checkbox">
+                    <label for="reasoningToggle" class="toggle-label">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
             <h2>API Settings</h2>
             <div id="missingKeysMessage" class="missing-keys-message"></div>
             <div class="settings-form">
@@ -62,8 +79,8 @@
                     <input type="password" id="groqKey" placeholder="Enter Groq API key">
                 </div>
                 <div class="form-group">
-                    <label for="elevenLabsKey">ElevenLabs API Key</label>
-                    <input type="password" id="elevenLabsKey" placeholder="Enter ElevenLabs API key">
+                    <label for="replicateApiKey">Replicate API Key</label>
+                    <input type="password" id="replicateApiKey" placeholder="Enter Replicate API key">
                 </div>
                 <div class="button-group">
                     <button id="saveSettings" class="primary-button">Save</button>

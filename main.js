@@ -13,7 +13,7 @@ let mainWindow;
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 900,
-        height: 700,
+        height: 800,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -71,6 +71,9 @@ app.on('activate', () => {
 ipcMain.handle('generate', async (_, topics) => {
     try {
         const outputDir = await ensureOutputDir();
+        const groqKey = store.get('groqKey');
+        const selectedModel = store.get('selectedModel') || 'llama-3.3-70b-versatile';
+        const enableReasoning = store.get('enableReasoning') || false;
         
         // Convert array to string if it's an array, or use the string directly
         const topicString = Array.isArray(topics) ? topics.join(' ') : topics;
@@ -81,17 +84,19 @@ ipcMain.handle('generate', async (_, topics) => {
         - Write a tight, hilarious stand-up routine about: ${topicString}
         
         Guidelines:
-        1. **Stage-ready material only**: Write exactly as you'd deliver it on stage—no stage directions, audience reactions, or parentheticals. The focus is 100% on the jokes and delivery.
-        2. **Start strong**: Open with a killer hook to grab the room immediately.
-        3. **Stay tight**: Keep the pacing snappy—every line should set up or land a laugh.
-        4. **Lean into sharp wit**: Use edgy, clever observations and cut right to the funny core of the topic.
-        5. **Master tension and release**: Build setups with relatable details, use callbacks to reward the audience, and surprise them with unexpected punchlines.
-        6. **Use vivid imagery**: Bring the audience into the joke with colourful language, metaphors, and comparisons that make the material pop.
-        7. **Work the room**: Channel the vibe of a comic at their best—confident, loose, and always in control of the energy.
+        1. **NO PREAMBLES**: Jump directly into the comedy material. Do NOT start with phrases like "Alright," "Here we go," "So," "You know what," or any introductory setup. Start immediately with the first joke.
+        2. **Stage-ready material only**: Write exactly as you'd deliver it on stage—no stage directions, audience reactions, or parentheticals. The focus is 100% on the jokes and delivery.
+        3. **Start strong**: Open with a killer hook to grab the room immediately.
+        4. **Stay tight**: Keep the pacing snappy—every line should set up or land a laugh.
+        5. **Lean into sharp wit**: Use edgy, clever observations and cut right to the funny core of the topic.
+        6. **Master tension and release**: Build setups with relatable details, use callbacks to reward the audience, and surprise them with unexpected punchlines.
+        7. **Use vivid imagery**: Bring the audience into the joke with colourful language, metaphors, and comparisons that make the material pop.
+        8. **Work the room**: Channel the vibe of a comic at their best—confident, loose, and always in control of the energy.
         
-        This is your best five minutes—a no-fluff, no-fat routine designed to leave the audience in stitches. Deliver it with the rhythm, sharpness, and timing of a comedy club pro at the top of their game.`;
+        This is your best five minutes—a no-fluff, no-fat routine designed to leave the audience in stitches. Deliver it with the rhythm, sharpness, and timing of a comedy club pro at the top of their game. BEGIN IMMEDIATELY WITH THE FIRST JOKE.`;
         
-        const jokeText = await generateJoke(prompt);
+        const jokeText = await generateJoke(prompt, groqKey, selectedModel, enableReasoning);
+        console.log('Generated Joke Text:', jokeText); // Log the joke text
         const audioPath = await synthesizeSpeech(jokeText);
 
         // Save routine metadata
@@ -145,25 +150,31 @@ ipcMain.handle('saveAudio', async (_, audioPath) => {
 });
 
 ipcMain.handle('saveSettings', async (_, settings) => {
-    if (!store) {
-        const { default: Store } = await import('electron-store');
-        store = new Store();
+    if (settings.groqKey) {
+        store.set('groqKey', settings.groqKey);
+    }
+    if (settings.replicateApiKey) {
+        store.set('replicateApiKey', settings.replicateApiKey);
     }
     if (settings.selectedVoice) {
         store.set('selectedVoice', settings.selectedVoice);
+    }
+    if (settings.selectedModel) {
+        store.set('selectedModel', settings.selectedModel);
+    }
+    if (settings.enableReasoning !== undefined) {
+        store.set('enableReasoning', settings.enableReasoning);
     }
     return { success: true };
 });
 
 ipcMain.handle('getSettings', async () => {
-    if (!store) {
-        const { default: Store } = await import('electron-store');
-        store = new Store();
-    }
     return {
-        selectedVoice: store.get('selectedVoice') || 'wLoW00IP5kfH8oiOBAPp',
         groqKey: store.get('groqKey'),
-        elevenLabsKey: store.get('elevenLabsKey'),
+        replicateApiKey: store.get('replicateApiKey'),
+        selectedVoice: store.get('selectedVoice'),
+        selectedModel: store.get('selectedModel'),
+        enableReasoning: store.get('enableReasoning'),
     };
 });
 
@@ -171,6 +182,6 @@ ipcMain.handle('getSettings', async () => {
 ipcMain.handle('checkApiKeys', async () => {
     return {
       hasGroqKey: !!store.get('groqKey'),
-      hasElevenLabsKey: !!store.get('elevenLabsKey')
+      hasReplicateApiKey: !!store.get('replicateApiKey')
     };
   });
